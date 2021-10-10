@@ -1,4 +1,7 @@
-# Getting Started with Create React App
+#note:
+main branch covers up to episode 24. the rest is on separate branches
+
+## Getting Started with Create React App
 
 ###cli command:  
 npx create-react-app . --template typescript
