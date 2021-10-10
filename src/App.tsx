@@ -1,7 +1,7 @@
 
 import React, {ReactNode, useCallback, useRef} from 'react';
 import './App.css';
-import {useTodos} from './useTodos'
+import {TodosProvider, useTodos, useAddTodos, useRemoveTodos} from './useTodos'
 import {findAllByDisplayValue} from "@testing-library/react"; // this is our custom hook - woohoo!
 
 
@@ -34,10 +34,40 @@ function UL<T>({
     </ul>
   )
 }
+const JustShowTodos = () => {
+  const todos = useTodos()
+  return (
+    <UL
+      items={todos}
+      itemClick={()=>{}}
+      render={(todo) => (
+        <>
+          {todo.text + ' '}
+        </>
+      )}
+    />
+  );
+}
+
+const appWrapper = ()=>(
+  <TodosProvider initialTodos={[{id:0, text: 'buy milk'}]}>
+  <div style={{
+    display:"grid",
+    gridTemplateColumns:"50% 50%"
+  }}>
+    <App></App>
+    <JustShowTodos />
+  </div>
+  </TodosProvider>
+)
+
 
 
 function App() {
-  const {todos, addTodo, removeTodo} = useTodos([{id:0, text:"hey there"}])
+  const todos = useTodos()
+  const addTodo = useAddTodos()
+  const removeTodo = useRemoveTodos()
+
   const newTodoRef = useRef<HTMLInputElement>(null)
 
   const onAddTodo = useCallback(() => {
@@ -60,22 +90,7 @@ function App() {
   return (
     <div>
       <Heading title="Second part"/>
-      <Box>
-        Wohoo!
-      </Box>
 
-      <Heading title="Todos"/>
-      {todos.map(todo => (
-        <div key={todo.id}>
-          {todo.text + ' '}
-          <button onClick={() =>removeTodo(todo.id)}>Remove
-          </button>
-        </div>
-      ))}
-      <div>
-        <input type="text" ref={newTodoRef}/>
-        <button onClick={onAddTodo}>Add Todo</button>
-      </div>
       <h1>Generic list</h1>
       <input type="text" ref={newTodoRef}/>
       <button onClick={onAddTodo}>Add Todo</button>
@@ -96,4 +111,4 @@ function App() {
   );
 }
 
-export default App;
+export default appWrapper;
