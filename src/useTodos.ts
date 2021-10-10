@@ -1,50 +1,31 @@
-import {useCallback, useReducer} from "react";
+import {useCallback, useEffect} from "react";
+import {createGlobalState} from 'react-use'
 
 interface Todo {
   id: number;
   text: string;
 }
 
-type ActionType =
-  | { type: "ADD", text: string }
-  | { type: "REMOVE", id: number }
+const useGlobalTodos = createGlobalState<Todo[]>([]) // creating global state with the 'react-use' library
 
 export function useTodos(initialTodos: Todo[]): {
   todos: Todo[];
   addTodo: (text: string) => void;
   removeTodo: (id: number) => void;
 } {
+  const [todos, setTodos] = useGlobalTodos() // implementing the global state
 
-  const [todos, dispatch] = useReducer((state: Todo[], action: ActionType) => {
-    switch (action.type) {
-      case "ADD":
-        return [
-          ...state, // this would be the array of existing todos
-          {
-            id: state.length,
-            text: action.text,
-          },
-        ];
-      case "REMOVE":
-        return state.filter(({id}) => id !== action.id);
-      default:
-        throw new Error()
-    }
-  }, initialTodos)
+  useEffect(()=>{
+  setTodos(initialTodos)
+  },[initialTodos])
 
   const addTodo = useCallback((text: string) => {
-    dispatch({
-      type: "ADD",
-      text
-    })
-  }, [])
+    setTodos([...todos,{ id:todos.length, text: text}])
+  }, [todos])
 
-  const removeTodo = useCallback((id: number) => {
-    dispatch({
-      type: "REMOVE",
-      id,
-    })
-  }, [])
+  const removeTodo = useCallback((removeId: number) => {
+    setTodos(todos.filter(({id}) => id !== removeId))
+  }, [todos])
 
   return {todos, addTodo, removeTodo}
 }

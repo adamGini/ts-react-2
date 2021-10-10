@@ -1,8 +1,7 @@
 
 import React, {ReactNode, useCallback, useRef} from 'react';
 import './App.css';
-import {useTodos} from './useTodos'
-import {findAllByDisplayValue} from "@testing-library/react"; // this is our custom hook - woohoo!
+import {useTodos} from './useTodos' // this is where the magic is
 
 
 const Heading = ({title}: { title: string }) => <h2>{title}</h2>
@@ -35,9 +34,10 @@ function UL<T>({
   )
 }
 
+const initialTodos = [{id:0, text:"hey there"}]
 
 function App() {
-  const {todos, addTodo, removeTodo} = useTodos([{id:0, text:"hey there"}])
+  const {todos, addTodo, removeTodo} = useTodos(initialTodos)
   const newTodoRef = useRef<HTMLInputElement>(null)
 
   const onAddTodo = useCallback(() => {
@@ -64,18 +64,6 @@ function App() {
         Wohoo!
       </Box>
 
-      <Heading title="Todos"/>
-      {todos.map(todo => (
-        <div key={todo.id}>
-          {todo.text + ' '}
-          <button onClick={() =>removeTodo(todo.id)}>Remove
-          </button>
-        </div>
-      ))}
-      <div>
-        <input type="text" ref={newTodoRef}/>
-        <button onClick={onAddTodo}>Add Todo</button>
-      </div>
       <h1>Generic list</h1>
       <input type="text" ref={newTodoRef}/>
       <button onClick={onAddTodo}>Add Todo</button>
@@ -96,4 +84,29 @@ function App() {
   );
 }
 
-export default App;
+const JustTheTodos = () => {
+  const {todos} = useTodos(initialTodos)
+  return(
+    <UL
+      /* since we defined the component as having detailed html props, we could pass things like className...*/
+      items={todos}
+      itemClick={()=>{}}
+      render={(todo) => (
+        <>
+          {todo.text + ' '}
+        </>
+      )}
+    />
+  )
+}
+const AppWrapper = () => (
+  <div style={{
+    display: 'grid',
+    gridTemplateColumns: '50% 50%'
+  }}>
+    <App />
+    <JustTheTodos />
+  </div>
+)
+
+export default AppWrapper;
