@@ -1,8 +1,7 @@
-
 import React, {ReactNode, useCallback, useRef} from 'react';
 import './App.css';
-import {useTodos} from './useTodos'
-import {findAllByDisplayValue} from "@testing-library/react"; // this is our custom hook - woohoo!
+import store, {selectTodos, addTodo, removeTodo} from './store'
+import {Provider, useDispatch, useSelector} from 'react-redux'
 
 
 const Heading = ({title}: { title: string }) => <h2>{title}</h2>
@@ -37,15 +36,17 @@ function UL<T>({
 
 
 function App() {
-  const {todos, addTodo, removeTodo} = useTodos([{id:0, text:"hey there"}])
+  const todos = useSelector(selectTodos)
+  const dispatch = useDispatch()
+
   const newTodoRef = useRef<HTMLInputElement>(null)
 
   const onAddTodo = useCallback(() => {
     if (newTodoRef.current) {
-      addTodo(newTodoRef.current.value)
+      dispatch(addTodo(newTodoRef.current.value))
       newTodoRef.current.value = "";
     }
-  }, [addTodo])
+  }, [dispatch])
 
   const Button: React.FunctionComponent<
     React.DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>
@@ -64,18 +65,7 @@ function App() {
         Wohoo!
       </Box>
 
-      <Heading title="Todos"/>
-      {todos.map(todo => (
-        <div key={todo.id}>
-          {todo.text + ' '}
-          <button onClick={() =>removeTodo(todo.id)}>Remove
-          </button>
-        </div>
-      ))}
-      <div>
-        <input type="text" ref={newTodoRef}/>
-        <button onClick={onAddTodo}>Add Todo</button>
-      </div>
+
       <h1>Generic list</h1>
       <input type="text" ref={newTodoRef}/>
       <button onClick={onAddTodo}>Add Todo</button>
@@ -86,7 +76,7 @@ function App() {
         render={(todo) => (
           <>
             {todo.text + ' '}
-            <button onClick={() => removeTodo(todo.id)}>Remove</button>
+            <button onClick={() => dispatch(removeTodo(todo.id))}>Remove</button>
           </>
         )}
       />
@@ -96,4 +86,33 @@ function App() {
   );
 }
 
-export default App;
+const JustTheTodos = () => {
+  const todos = useSelector(selectTodos)
+
+  return (
+    <UL
+      items={todos}
+      itemClick={() => {
+      }}
+      render={(todo) => (
+        <>
+          {todo.text + ' '}
+        </>
+      )}
+    />
+  )
+}
+
+const AppWrapper = () => (
+  <Provider store={store}>
+    <div style={{
+      display: 'grid',
+      gridTemplateColumns: '50% 50%'
+    }}>
+      <App/>
+      <JustTheTodos/>
+    </div>
+  </Provider>
+)
+
+export default AppWrapper;

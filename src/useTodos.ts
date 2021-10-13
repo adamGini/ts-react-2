@@ -1,19 +1,19 @@
 import {useCallback, useReducer} from "react";
 
-interface Todo {
-  id: number;
-  text: string;
-}
-
 type ActionType =
   | { type: "ADD", text: string }
   | { type: "REMOVE", id: number }
 
+  interface Todo {
+    id: number;
+    text: string;
+  }
 export function useTodos(initialTodos: Todo[]): {
   todos: Todo[];
   addTodo: (text: string) => void;
   removeTodo: (id: number) => void;
 } {
+
 
   const [todos, dispatch] = useReducer((state: Todo[], action: ActionType) => {
     switch (action.type) {
